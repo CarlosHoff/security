@@ -1,32 +1,51 @@
 package br.com.hoffmann.security.service;
 
-import br.com.hoffmann.security.repository.UsuarioRepository;
+import static java.lang.String.format;
+
+import br.com.hoffmann.security.cripto.CriptografiaUtils;
+import br.com.hoffmann.security.domain.request.UsuarioRequest;
+import br.com.hoffmann.security.domain.response.UsuarioResponse;
 import br.com.hoffmann.security.entity.UsuarioEntity;
-import java.util.ArrayList;
+import br.com.hoffmann.security.repository.UsuarioRepository;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UsuarioService implements UserDetailsService {
+@Transactional(value = "transactionManager")
+public class UsuarioService {
 
   @Autowired
   private UsuarioRepository usuarioRepository;
 
-  @Override
-  public UserDetails loadUserByUsername(String username) {
-    UserDetails retorno = null;
-    Optional<UsuarioEntity> entityExample = this.usuarioRepository
-        .findOne(Example.of(UsuarioEntity.from(username)));
-    if (entityExample.isPresent()) {
-      UsuarioEntity usuarioEntity = entityExample.get();
-      retorno = new User(usuarioEntity.getLogin(), usuarioEntity.getSenha(), new ArrayList<>());
-      return retorno;
+  @Autowired
+  private CriptografiaUtils criptografiaUtils;
+
+  public void cadastraUsuario(UsuarioRequest request) {
+    UsuarioEntity usuarioEntity = new UsuarioEntity(request);
+    usuarioEntity.setSenha(this.criptografiaUtils.encode(request.getSenha()));
+    usuarioRepository.save(usuarioEntity);
+  }
+
+  public void deletaUsuario(Long id) {
+    usuarioRepository.deleteById(id);
+  }
+
+  public List<UsuarioResponse> buscaUsuarios() {
+    List<UsuarioEntity> usuario = usuarioRepository.findAll();
+    return usuario.stream().map(UsuarioResponse::new)
+        .peek(user -> user.setSenha("**********")).collect(Collectors.toList());
+  }
+
+  public UsuarioResponse buscaUsuariosPeloID(Long id) throws NotFoundException {
+    Optional<UsuarioEntity> usuario = usuarioRepository.findById(id);
+    if (!usuario.isPresent()) {
+      throw new NotFoundException(format("Usuario: [%s] não foi encontrado", id));
     }
-    return retorno;
+    return new UsuarioResponse(usuario.get());
   }
 }

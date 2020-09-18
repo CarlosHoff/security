@@ -1,7 +1,7 @@
 package br.com.hoffmann.security.config;
 
 import br.com.hoffmann.security.login.UserCredentials;
-import br.com.hoffmann.security.service.TokenAuthenticationService;
+import br.com.hoffmann.security.security.TokenAuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Collections;

@@ -1,6 +1,6 @@
 package br.com.hoffmann.security.config;
 
-import br.com.hoffmann.security.service.TokenAuthenticationService;
+import br.com.hoffmann.security.security.TokenAuthenticationService;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

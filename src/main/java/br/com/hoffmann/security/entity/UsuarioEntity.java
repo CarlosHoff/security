@@ -1,26 +1,51 @@
 package br.com.hoffmann.security.entity;
 
-import javax.persistence.Basic;
+import br.com.hoffmann.security.domain.request.UsuarioRequest;
+import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.GenerationType;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-@Entity(name = "usuario")
-public class UsuarioEntity {
+@Entity
+@Table(name = "USUARIO_ENTITY")
+public class UsuarioEntity implements UserDetails {
 
-  @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "SQ_USUARIO_ENTITY")
+  @SequenceGenerator(sequenceName = "SQ_USUARIO_ENTITY", allocationSize = 1, name = "SQ_USUARIO_ENTITY")
+  @Column(name = "ID")
   private Long id;
-  @Basic(optional = false)
-  @Column(nullable = false)
-  private String login;
-  @Basic(optional = false)
-  @Column(nullable = false)
+
+  @Column(name = "NOME", nullable = false)
+  private String nome;
+
+  @Column(name = "EMAIL", nullable = false)
+  private String email;
+
+  @Column(name = "SENHA", nullable = false)
   private String senha;
 
-  private UsuarioEntity(String login) {
-    this.login = login;
+  @Column(name = "RUA", nullable = false)
+  private String rua;
+
+  @Column(name = "CIDADE", nullable = false)
+  private String cidade;
+
+  @Column(name = "BAIRRO", nullable = false)
+  private String bairro;
+
+  @Column(name = "CEP", nullable = false)
+  private String cep;
+
+  @Column(name = "ESTADO", nullable = false)
+  private String estado;
+
+  private UsuarioEntity(String email) {
+    this.email = email;
     id = null;
     senha = null;
   }
@@ -28,14 +53,24 @@ public class UsuarioEntity {
   public UsuarioEntity() {
   }
 
-  public UsuarioEntity(Long id, String login, String senha) {
+  public UsuarioEntity(Long id, String email, String senha) {
     this.id = id;
-    this.login = login;
+    this.email = email;
     this.senha = senha;
   }
 
-  public static UsuarioEntity from(String login) {
-    return new UsuarioEntity(login);
+  public static UsuarioEntity from(String email) {
+    return new UsuarioEntity(email);
+  }
+
+  public UsuarioEntity(UsuarioRequest request) {
+    this.nome = request.getNome();
+    this.email = request.getEmail();
+    this.rua = request.getRua();
+    this.cidade = request.getCidade();
+    this.bairro = request.getBairro();
+    this.cep = request.getCep();
+    this.estado = request.getEstado();
   }
 
   public Long getId() {
@@ -46,12 +81,20 @@ public class UsuarioEntity {
     this.id = id;
   }
 
-  public String getLogin() {
-    return login;
+  public String getNome() {
+    return nome;
   }
 
-  public void setLogin(String login) {
-    this.login = login;
+  public void setNome(String nome) {
+    this.nome = nome;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   public String getSenha() {
@@ -60,5 +103,90 @@ public class UsuarioEntity {
 
   public void setSenha(String senha) {
     this.senha = senha;
+  }
+
+  public String getRua() {
+    return rua;
+  }
+
+  public void setRua(String rua) {
+    this.rua = rua;
+  }
+
+  public String getCidade() {
+    return cidade;
+  }
+
+  public void setCidade(String cidade) {
+    this.cidade = cidade;
+  }
+
+  public String getBairro() {
+    return bairro;
+  }
+
+  public void setBairro(String bairro) {
+    this.bairro = bairro;
+  }
+
+  public String getCep() {
+    return cep;
+  }
+
+  public void setCep(String cep) {
+    this.cep = cep;
+  }
+
+  public String getEstado() {
+    return estado;
+  }
+
+  public void setEstado(String estado) {
+    this.estado = estado;
+  }
+
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return null;
+  }
+
+  @Override
+  public String getPassword() {
+    return this.senha;
+  }
+
+  @Override
+  public String getUsername() {
+    return this.email;
+  }
+
+  @Override
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return true;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
   }
 }
